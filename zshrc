@@ -70,3 +70,7 @@ alias ls="ls -G"
 
 alias so='source'
 alias vz='vim ~/.zshrc'
+
+# xonsh起動
+alias x='xonsh'
+x
