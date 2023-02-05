@@ -85,6 +85,6 @@ alias gst='git status'
 # pyenv install 3.10.4
 # pyenv global 3.10.4
 
-export PYENV_ROOT=“$HOME/.pyenv”
-command -v pyenv >/dev/null || export PATH=“$PYENV_ROOT/bin:$PATH”
-eval “$(pyenv init -)”
+export PYENV_ROOT="$HOME/.pyenv"
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
