@@ -69,8 +69,22 @@ alias ll="ls -l -G"
 alias ls="ls -G"
 
 alias so='source'
+alias sz='source ~/.zshrc'
 alias vz='vim ~/.zshrc'
 
-# xonsh起動
-alias x='xonsh'
-x
+alias gb='git branch'
+alias gfp='git fetch && git pull'
+alias gds='git diff --stat'
+alias gst='git status'
+
+# ------------
+# pyenv setup
+# ------------
+# https://github.com/pyenv/pyenv
+# git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+# pyenv install 3.10.4
+# pyenv global 3.10.4
+
+export PYENV_ROOT=“$HOME/.pyenv”
+command -v pyenv >/dev/null || export PATH=“$PYENV_ROOT/bin:$PATH”
+eval “$(pyenv init -)”
