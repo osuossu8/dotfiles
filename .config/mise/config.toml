@@ -1,0 +1,61 @@
+[tools]
+# --- ホスト・コンテナ共通のツール定義 ---
+node = "20"
+uv = "latest"
+"npm:@devcontainers/cli" = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
+ 
+[tasks.dev]
+description = "ホスト側：使い捨て環境を立ち上げる"
+run = """
+#!/bin/bash
+
+eval "$(mise activate bash)"
+
+# 1. 一時ディレクトリ作成
+export ISOLATED_WS=$(mktemp -d 2>/dev/null || mktemp -d -t 'dotfiles')
+WS_NAME=$(basename "$ISOLATED_WS")
+
+cp -r .config .devcontainer "$ISOLATED_WS/"
+
+# 2. クリーンアップ予約
+trap 'rm -rf "$ISOLATED_WS"' EXIT INT TERM
+
+# 3. コンテナ起動
+devcontainer up --workspace-folder "$ISOLATED_WS"
+devcontainer exec --workspace-folder "$ISOLATED_WS" mise trust
+devcontainer exec --workspace-folder "$ISOLATED_WS" mise run container-setup
+
+# 4. コンテナに入る
+devcontainer exec --workspace-folder "$ISOLATED_WS" bash
+"""
+
+[tasks.container-setup]
+description = "コンテナ側：miseを使ってツールを自動セットアップ"
+run = """
+#!/bin/bash
+
+mise install -y
+
+# gcloud CLI のインストール (使い捨て環境なのでバイナリを直接入れる方が早い)
+if ! command -v gcloud &> /dev/null; then
+    echo "📦 Installing gcloud CLI..."
+    curl -sSL https://sdk.cloud.google.com | bash -s -- --disable-prompts --install-dir=$HOME > /dev/null
+fi
+export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+
+# 永続化設定 (cat << 'EOF' を使ってエスケープを不要にする)
+cat << 'EOF' >> ~/.bashrc
+
+# --- mise setup ---
+export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+eval "$(mise activate bash)"
+EOF
+
+source ~/.bashrc
+
+# 各種認証
+gcloud auth login --no-launch-browser
+gcloud auth application-default login --no-launch-browser
+gh auth login
+"""
