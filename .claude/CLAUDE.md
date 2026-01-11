@@ -3,17 +3,26 @@
 **Always use `uv`, not `pip` or `poetry`.**
 **Always use `gh` for GitHub operations.**
 
+## Before Starting Any Task
+
+**ALWAYS follow this sequence at the start of every new task:**
+
 ```sh
 # 0. Initial setup (first time only)
 gh repo set-default
 gh auth login
 
-# 1. Create a working branch
-gh pr checkout main              # Switch to main branch
-git checkout -b feature/your-feature-name
-# Note: gh doesn't support branch creation, so git is allowed here
+# 1. Switch to main/master branch and get latest changes
+git checkout main                # or 'git checkout master' if using master
+git pull origin main             # Pull latest changes from remote
+# If using master: git pull origin master
 
-# 2. Make changes and run code
+# 2. Create a new feature branch
+git checkout -b feature/descriptive-task-name
+# Branch naming: feature/*, fix/*, docs/*, test/*, refactor/*
+# Example: feature/add-user-auth, fix/database-connection
+
+# 3. Make changes and run code
 uv run python your_script.py
 
 # If errors occur:
@@ -23,49 +32,69 @@ uv run python your_script.py
 # - Repeat until successful
 # Use Claude Code to help debug if needed
 
-# 3. Run tests (if tests exist)
+# 4. Run tests (if tests exist)
 uv run pytest                    # Run all tests
 uv run pytest tests/test_file.py # Specific test file
 uv run pytest -k "test_name"     # Specific test
 # Fix any failing tests before proceeding
 
-# 4. Typecheck (REQUIRED)
+# 5. Typecheck (REQUIRED)
 uv tool run mypy .
 # Fix all type errors
 
-# 5. Lint before committing (REQUIRED)
+# 6. Lint before committing (REQUIRED)
 uv tool run ruff check .         # Check all files
 uv tool run ruff format .        # Format all files
 uv tool run ruff check path/to/file.py  # Specific files
 # Fix all lint errors before committing
 
-# 6. Commit changes (only after all checks pass)
+# 7. Commit changes (only after all checks pass)
 git add .
 git commit -m "feat: your feature description"
 git push -u origin feature/your-feature-name
 # Follow Conventional Commits format
 
-# 7. Before creating PR - final check
+# 8. Before creating PR - final check
 uv tool run ruff check . && uv tool run ruff format . && uv tool run mypy . && uv run pytest
 
-# 8. Create Pull Request
+# 9. Create Pull Request (REQUIRED - do not skip this step)
 gh pr create --title "feat: Feature description" --body "Detailed explanation of changes"
+# This will open your browser or prompt for PR details
+# Make sure the PR is successfully created before proceeding
 
-# 9. Self-review (REQUIRED)
+# 10. Self-review (REQUIRED)
 gh pr view --web
 # Review your own PR using the checklist below
 gh pr comment --body "✅ Self-review complete: [your findings]"
 
-# 10. Address feedback
+# 11. Address feedback
 # Read your self-review comments
 gh pr view --comments
 # Fix issues found in self-review
-# Repeat steps 2-7 until all issues are resolved
+# Repeat steps 3-8 until all issues are resolved
 # Push changes
 git add .
 git commit -m "fix: address self-review feedback"
 git push
 ```
+
+## Critical: Task Start Checklist
+
+**Before starting ANY new task, verify you have completed:**
+
+- [ ] Switched to main/master branch: `git checkout main`
+- [ ] Pulled latest changes: `git pull origin main`
+- [ ] Created new feature branch: `git checkout -b feature/task-name`
+- [ ] Confirmed you are on the new branch: `git branch --show-current`
+
+**After completing the task, verify:**
+
+- [ ] All tests pass
+- [ ] All lints pass
+- [ ] All type checks pass
+- [ ] Changes committed and pushed
+- [ ] **Pull Request created** (use `gh pr create`)
+- [ ] Self-review completed with comments
 
 ## Package Management
 
