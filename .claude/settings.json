@@ -1,134 +1,74 @@
 {
   "permissions": {
-    "execute": {
-      "allow": [
-        "uv",
-        "gh",
-        "git",
-        "pytest",
-        "mypy",
-        "ruff"
-      ]
-    },
-    "read": [
-      "**/*.py",
-      "**/*.md",
-      "**/*.toml",
-      "**/*.txt",
-      "**/*.json",
-      "**/*.yaml",
-      "**/*.yml",
-      ".env.example",
-      "tests/**/*",
-      "pyproject.toml",
-      "uv.lock",
-      ".gitignore"
+    "allow": [
+      "Bash(uv:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)",
+      "Bash(pytest:*)",
+      "Bash(mypy:*)",
+      "Bash(ruff:*)",
+      "Read(**/*.py)",
+      "Read(**/*.md)",
+      "Read(**/*.toml)",
+      "Read(**/*.txt)",
+      "Read(**/*.json)",
+      "Read(**/*.yaml)",
+      "Read(**/*.yml)",
+      "Read(.env.example)",
+      "Read(tests/**/*)",
+      "Read(pyproject.toml)",
+      "Read(uv.lock)",
+      "Read(.gitignore)",
+      "Write(**/*.py)",
+      "Write(**/*.md)",
+      "Write(**/*.toml)",
+      "Write(**/*.json)",
+      "Write(tests/**/*)",
+      "Write(pyproject.toml)",
+      "Write(uv.lock)"
     ],
-    "write": [
-      "**/*.py",
-      "**/*.md",
-      "**/*.toml",
-      "**/*.json",
-      "tests/**/*",
-      "pyproject.toml",
-      "uv.lock"
-    ],
-    "deny": {
-      "read": [
-        ".env",
-        "**/*.key",
-        "**/*.pem",
-        "**/secrets/**",
-        "**/.git/**"
-      ],
-      "write": [
-        ".env",
-        "**/*.key",
-        "**/*.pem",
-        "**/secrets/**"
-      ]
-    }
-  },
-  "commands": {
-    "allowed": [
-      "uv run python {file}",
-      "uv run pytest",
-      "uv run pytest {path}",
-      "uv run pytest -k {test_name}",
-      "uv tool run ruff check .",
-      "uv tool run ruff format .",
-      "uv tool run ruff check {file}",
-      "uv tool run mypy .",
-      "uv tool run mypy {path}",
-      "uv add {package}",
-      "uv add --dev {package}",
-      "uv remove {package}",
-      "uv sync",
-      "uv lock",
-      "gh pr checkout main",
-      "gh pr create",
-      "gh pr view",
-      "gh pr view --web",
-      "gh pr view --comments",
-      "gh pr comment",
-      "gh pr diff",
-      "gh repo set-default",
-      "gh auth status",
-      "git checkout -b {branch}",
-      "git add .",
-      "git add {file}",
-      "git commit -m {message}",
-      "git push",
-      "git push -u origin {branch}",
-      "git status",
-      "git diff",
-      "git log"
-    ],
-    "denied": [
-      "rm -rf",
-      "sudo",
-      "curl *",
-      "wget *",
-      "git push --force",
-      "git push -f"
+    "deny": [
+      "Read(.env)",
+      "Read(**/*.key)",
+      "Read(**/*.pem)",
+      "Read(**/secrets/**)",
+      "Read(**/.git/**)",
+      "Write(.env)",
+      "Write(**/*.key)",
+      "Write(**/*.pem)",
+      "Write(**/secrets/**)",
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
     ]
   },
   "workflow": {
-    "auto_lint": true,
-    "auto_format": true,
-    "auto_typecheck": true,
-    "require_tests": true,
-    "commit_message_format": "conventional"
+    "beforeTask": [
+      "git checkout main || git checkout master",
+      "git pull origin main || git pull origin master",
+      "git checkout -b feature/${TASK_NAME}"
+    ],
+    "beforeCommit": [
+      "uv tool run ruff check .",
+      "uv tool run ruff format .",
+      "uv tool run mypy ."
+    ],
+    "beforePR": [
+      "uv tool run ruff check .",
+      "uv tool run ruff format .",
+      "uv tool run mypy .",
+      "uv run pytest"
+    ],
+    "afterPR": [
+      "gh pr view --web"
+    ]
   },
-  "tools": {
-    "ruff": {
-      "enabled": true,
-      "check_before_commit": true,
-      "format_before_commit": true
-    },
-    "mypy": {
-      "enabled": true,
-      "check_before_commit": true,
-      "strict": true
-    },
-    "pytest": {
-      "enabled": true,
-      "run_before_commit": false,
-      "run_before_pr": true
-    }
-  },
-  "github": {
-    "auto_create_branch": true,
-    "branch_naming": "feature/{description}",
-    "require_self_review": true,
-    "pr_template": {
-      "title_prefix": "feat|fix|docs|test|refactor|chore",
-      "require_description": true
-    }
-  },
-  "security": {
-    "scan_for_secrets": true,
-    "block_sensitive_files": true,
-    "require_env_example": true
+  "conventions": {
+    "branchNaming": "feature|fix|docs|test|refactor|chore",
+    "commitMessage": "conventional",
+    "requireTypeAnnotations": true,
+    "requireTests": true,
+    "requireSelfReview": true
   }
 }
