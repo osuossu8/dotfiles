@@ -16,7 +16,7 @@ eval "$(mise activate bash)"
 export ISOLATED_WS=$(mktemp -d 2>/dev/null || mktemp -d -t 'dotfiles')
 WS_NAME=$(basename "$ISOLATED_WS")
 
-cp -r .config .devcontainer "$ISOLATED_WS/"
+cp -r .config .devcontainer .claude "$ISOLATED_WS/"
 
 # 2. クリーンアップ予約
 trap 'rm -rf "$ISOLATED_WS"' EXIT INT TERM

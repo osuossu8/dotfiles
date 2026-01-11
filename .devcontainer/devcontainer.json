@@ -12,7 +12,7 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["jdx.mise-vscode"]
+      "extensions": ["jdx.mise-vscode", "ms-vscode.remote-containers"]
     }
   },
   "remoteUser": "vscode"
